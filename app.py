@@ -1,5 +1,5 @@
 import os
-import openai
+from openai import OpenAI
 from flask import Flask, request, render_template
 from twilio.rest import Client
 import random
@@ -10,35 +10,29 @@ app = Flask(__name__)
 account_sid = os.getenv('TWILIO_ACCOUNT_SID')
 auth_token = os.getenv('TWILIO_AUTH_TOKEN')
 twilio_phone_number = '+18889668985'
-client = Client(account_sid, auth_token)
+
+# Check if credentials are set
+if not account_sid or not auth_token:
+    raise ValueError("Twilio credentials are not set. Please check your environment variables.")
+twilioclient = Client(account_sid, auth_token)
 
 # OpenAI configuration
-openai.api_key = os.getenv('OPENAI_API_KEY')
+client = OpenAI(api_key=os.getenv('OPENAI_API_KEY'))
 
-# Predefined affirmations
-affirmations = [
-    "You are capable of amazing things!",
-    "You are enough!",
-    "You are loved!",
-    "You are strong!",
-    "You are doing great!",
-    "You are worthy of happiness!",
-    "You are a unique and special individual!"
-]
-
-# Function to generate a random affirmation
-def generate_affirmation():
-    return random.choice(affirmations)
+# Initialize the OpenAI client
+client = OpenAI(api_key=os.getenv('OPENAI_API_KEY'))
 
 # Function to generate affirmation using OpenAI
 def generate_affirmation_openai():
-    prompt = "Generate a word of affirmation."
-    response = openai.Completion.create(
-        engine="gpt-3.5-turbo-instruct",  # You can experiment with different engines
-        prompt=prompt,
-        max_tokens=50  
+    response = client.chat.completions.create(
+        model="gpt-3.5-turbo",
+        messages=[
+            {"role": "system", "content": "You are a helpful assistant that generates positive affirmations."},
+            {"role": "user", "content": "Generate a word of affirmation."}
+        ],
+        max_tokens=50
     )
-    return response.choices[0].text.strip()
+    return response.choices[0].message.content.strip()
 
 # Route for the homepage
 @app.route('/')
@@ -55,7 +49,7 @@ def send_affirmation():
     affirmation = generate_affirmation_openai()  # Use this line for OpenAI-generated affirmations
 
     try:
-        message = client.messages.create(
+        message = twilioclient.messages.create(
             body=affirmation,
             from_=twilio_phone_number,
             to=recipient_number
