@@ -1,8 +1,7 @@
 import os
-from openai import OpenAI
+import openai
 from flask import Flask, request, render_template
 from twilio.rest import Client
-import random
 
 app = Flask(__name__)
 
@@ -17,22 +16,19 @@ if not account_sid or not auth_token:
 twilioclient = Client(account_sid, auth_token)
 
 # OpenAI configuration
-client = OpenAI(api_key=os.getenv('OPENAI_API_KEY'))
-
-# Initialize the OpenAI client
-client = OpenAI(api_key=os.getenv('OPENAI_API_KEY'))
+openai.api_key = os.getenv('OPENAI_API_KEY')
 
 # Function to generate affirmation using OpenAI
 def generate_affirmation_openai():
-    response = client.chat.completions.create(
-        model="gpt-3.5-turbo",
+    response = openai.ChatCompletion.create(
+        model="gpt-4o-mini",
         messages=[
             {"role": "system", "content": "You are a helpful assistant that generates positive affirmations."},
             {"role": "user", "content": "Generate a word of affirmation."}
         ],
         max_tokens=50
     )
-    return response.choices[0].message.content.strip()
+    return response.choices[0].message['content'].strip()
 
 # Route for the homepage
 @app.route('/')
