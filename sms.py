@@ -156,7 +156,7 @@ def sms_reply():
     response = run_full_turn(agent, messages)
 
     # Prepare the response
-    reply_message = response.messages[-1]['content'] if response.messages else "Something went wrong."
+    reply_message = response.messages[-1].content if response.messages else "Something went wrong."
 
     # Create a Twilio response object
     resp = MessagingResponse()
@@ -166,4 +166,4 @@ def sms_reply():
 
 # Run the Flask app
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run(host='0.0.0.0', port=8080)

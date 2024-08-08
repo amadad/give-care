@@ -1,0 +1,23 @@
+[tool.poetry]
+name = "repl-nix-give-care"
+version = "0.1.0"
+description = ""
+authors = ["Your Name <you@example.com>"]
+readme = "README.md"
+packages = [{include = "repl_nix_give_care"}]
+
+[tool.poetry.dependencies]
+python = "^3.12"
+openai = "^1.40.0"
+pydantic = "^2.8.2"
+requests = "^2.32.3"
+transformers = "^4.43.4"
+twilio = "^9.2.3"
+flask = "^3.0.3"
+phi = "^0.6.7"
+psycopg2-binary = "^2.9.9"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
